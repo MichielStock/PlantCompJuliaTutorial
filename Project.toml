@@ -1,0 +1,9 @@
+name = "PlantCompTutorial"
+uuid = "a51adf8b-92dd-41fb-8623-faf0405ab216"
+authors = ["michielstock <michielfmstock@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
