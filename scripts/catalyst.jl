@@ -50,6 +50,8 @@ end k1 k2 k3 k4 kpr
 
 convert(ODESystem, photosynthesis; combinatoric_ratelaws=false)
 
+# Exercise?
+
 photorespiration = @reaction_network begin
     kpr, RuBP + O2 --> PGP + PGA
 end kpr
