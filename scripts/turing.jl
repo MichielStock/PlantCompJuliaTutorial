@@ -35,7 +35,7 @@ plot(chain1)
 
 p_A_better_than_B = mean(chain1[:p_A] .> chain1[:p_B])
 
-p_A_much_better_than_B = mean(chain1[:p_A] .> 2chain1[:p_B])
+p_A_much_better_than_B = mean(chain1[:p_A] .> 1.2chain1[:p_B])
 
 # Fitting a curve probability
 

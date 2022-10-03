@@ -4,6 +4,16 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+end
+
 # ╔═╡ 5c140e46-2469-11ed-00f2-c1f22789cfe3
 using Plots, DifferentialEquations, PlutoUI
 
@@ -55,7 +65,7 @@ K = 100.0
 plot(x->σ(x, K=K, μ=μ), 0, 1.2K, xlabel="biomass x [kg]", ylabel="growth [kg / day]")
 
 # ╔═╡ ac8fb9fc-dad9-41bd-b716-5217bae03a51
-md"Note that growth is maximal at $x=$ $(K/2) and becomes negative when $x>K$."
+md"Note that growth is maximal at $x=K/2$ and becomes negative when $x>K$."
 
 # ╔═╡ fd02957b-5fff-4566-bb0a-fee3f2945dba
 md"We rewrite the logistic function into the standard form (note that there is no dependence on $t$)."
@@ -69,17 +79,48 @@ md"We then need to specify the initial value"
 # ╔═╡ 1750eaa6-c593-4b4b-9675-28929995380a
 x0 = 1.0
 
+# ╔═╡ 6ce9f134-0526-4552-ae56-10c02d2f1e50
+md"Turn this in an ODE problem:"
+
 # ╔═╡ 75e911fa-7705-48c1-9a10-69f143c34626
 prob = ODEProblem(f,  # function 
 					x0,  # initial value 
 				 (0.0, 60.),  # time interval (t0, tend)
 					(μ, K))  # the parameters, if any
 
+# ╔═╡ d791e2d9-4aec-415e-b4f2-f0b0cc48a57e
+md"... and `solve` the problem:"
+
 # ╔═╡ 6f8e2105-f549-4ea5-8869-3c33c799d86e
 sol = solve(prob)  # solve the differential equation using a numerical solver
 
 # ╔═╡ 631e0d6b-4004-467c-99c2-59cf34bdc442
 plot(sol)
+
+# ╔═╡ 58e66f06-08b0-4f55-9eec-a6b46fdd43ab
+md"""
+> **Exercise** Implement a new model where the growth depends on the time: $x' = \mu(\sin(w2\pi t)/2 + 1/2)(1-x/K)$.
+
+Fill in the function below (we use $g$ instead of $f$). There is a slider where you can tune the periodicity $w$.
+""" 
+
+# ╔═╡ 21759c5e-ef85-4928-ac2b-786619aaa89a
+g(x, (μ, K, w), t) = μ * (0.5sin(w * t) + 0.5) * x * (1-x/K)
+
+# ╔═╡ bce0d3ad-2ebf-43cd-bc5e-411ab829d48f
+md" w: $(@bind w Slider(0.1:0.1:2, show_value=true))"
+
+# ╔═╡ c17432c9-55de-47d3-8bd6-5ee04338eb0e
+w
+
+# ╔═╡ 1c0a51a4-cb84-4e01-9440-22781858f3e8
+prob_exercise = missing  # solve
+
+# ╔═╡ 258f3d1a-0d14-45bb-98be-0e3a8cced8c9
+# solve the ODE
+
+# ╔═╡ 2dd2bde4-99d7-479d-a353-b1a55ea5e785
+# Plot the ODE
 
 # ╔═╡ d28f1c8b-cf4a-4e4b-81ab-0d4a6276329e
 md"""
@@ -102,9 +143,13 @@ scatter(ts, xs, xlabel="t [weeks]", label="Dry matter [Mg ha^-1]", legend=:botto
 
 # ╔═╡ 055a2a09-31b0-4e1b-a5c4-2f1cc71671ba
 md"""
-We can compute the sum of squared errors between the data ($y_i$) and our model ($\hat{y}_i$) to calibrate the parameters
+We can compute the sum of squared errors between the data ($y_i$) and our model ($\hat{y}_i$) to calibrate the parameters:
 
 $$SSE(\theta) = \sum_i (x_i - \hat{x}(t_i;\theta))^2$$
+
+Then the best parameters are found by solving the following optimization problem:
+
+$$\min_\theta\, SSE(\theta)$$
 """
 
 # ╔═╡ bda3fba1-aacd-471d-9057-3454646944b5
@@ -123,7 +168,7 @@ sse(μ, K)
 md"For two parameters, the error form a kind of landscape with a (hopefully!) clear optimum value."
 
 # ╔═╡ f705da23-2b0e-4b1c-9035-885243025f4f
-contourf(0.01:0.1:5, 1:0.2:15, sse, color=:speed, xlab="μ", ylab="K", title="Sum of squared error")
+contourf(0.01:0.1:3, 1:0.2:15, sse, color=:speed, xlab="μ", ylab="K", title="Sum of squared error")
 
 # ╔═╡ eea1f369-f5d8-472c-a434-8e49910a68e6
 md"Using the `Optim` package, we can find this minimum."
@@ -148,6 +193,20 @@ md"""
 ## A system of ODEs: the R* rule
 """
 
+# ╔═╡ cd7a1801-d97b-4fa3-850d-04dafd83b19f
+md"""
+Let us move to a *system of ordinary differential equations*: consideriing several coupled variables.
+
+To this end, consider the R* rule:
+
+
+$${\frac {dN_{j}}{dt}}=N_{j}(a_{j}R-d)$$
+$$\frac{dR}{dt}=r-R\sum _{j}a_{j}N_{j}$$
+
+Here, there is a shared resource $N$ that is consumed by several competing species $N_j$. For example, this might be nitrogen that is used by both the crop and the weeds.
+
+"""
+
 # ╔═╡ 65221a3d-9a7a-4469-8b4b-68ad59321d94
 function Rstar(u, (a1, a2, d, r), t)
 	N1, N2, R = u
@@ -163,8 +222,8 @@ Rstar([10, 20, 2], (1.0, 0.1, 2., 0.1), 0)  # example
 
 # ╔═╡ 16be68c9-03ac-45cc-86dc-3c09e7a983dd
 u0 = [10.0,  # N1
-	1.0,  # N2
-	20.0]  # R
+	   1.0,  # N2
+	 20.0]   # R
 
 # ╔═╡ 682ceb54-e674-4cc8-bc6d-f84a211d7677
 d = 0.011
@@ -186,13 +245,13 @@ plot(sol2, labels=["N₁" "N₂" "R"], lw=2)
 
 # ╔═╡ 1349b830-1627-47bf-b6db-cdcd987de3a5
 md"""
-Exercises
-1. Change the model such that every plant species has its own value of $d$, i.e. $d_1$, $d_2$. Set $d_1=0.01$ and $d_2=0.2$ (weeds are being removed).
-2. Change the model such that $r$ is a **function depending on $t$**, rather than a parameter, i.e $r(t)$. Try several options:
-   - `r(t) = t < 20 ? 2 : 0`
-   - `r(t) = t > 10 ? 1 : 0`
-   - `r(t) = 10 < t < 20 ? 10 : 0.5`
-   - `r(t) = 1.5 + 0.9sin(0.2t)`
+> **Exercises:**
+> 1. Change the model such that every plant species has its own value of $d$, i.e. $d_1$, $d_2$. Set $d_1=0.01$ and $d_2=0.2$ (weeds are being removed).
+> 2. Change the model such that $r$ is a **function depending on $t$**, rather than a parameter, i.e $r(t)$. Try several options:
+>   - `r(t) = t < 20 ? 2 : 0`
+>   - `r(t) = t > 10 ? 1 : 0`
+>   - `r(t) = 10 < t < 20 ? 10 : 0.5`
+>   - `r(t) = 1.5 + 0.9sin(0.2t)`
 """
 
 # ╔═╡ 1f7e97f2-2cdb-4cd8-9aca-e50de742e18f
@@ -217,8 +276,9 @@ PlutoUI = "~0.7.39"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.2"
+julia_version = "1.8.2"
 manifest_format = "2.0"
+project_hash = "5f4d8c3add18dc9b26f774bc2542b37b7dec6e6a"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -234,6 +294,7 @@ version = "3.4.0"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+version = "1.1.1"
 
 [[deps.ArnoldiMethod]]
 deps = ["LinearAlgebra", "Random", "StaticArrays"]
@@ -404,6 +465,7 @@ version = "4.2.0"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "0.5.2+0"
 
 [[deps.ConstructionBase]]
 deps = ["LinearAlgebra"]
@@ -517,8 +579,9 @@ uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 version = "0.9.1"
 
 [[deps.Downloads]]
-deps = ["ArgTools", "LibCURL", "NetworkOptions"]
+deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+version = "1.6.0"
 
 [[deps.DualNumbers]]
 deps = ["Calculus", "NaNMath", "SpecialFunctions"]
@@ -556,10 +619,10 @@ uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 version = "0.4.1"
 
 [[deps.FFMPEG_jll]]
-deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "Pkg", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
-git-tree-sha1 = "ccd479984c7838684b3ac204b716c89955c76623"
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Pkg", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+git-tree-sha1 = "74faea50c1d007c85837327f6775bea60b5492dd"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
-version = "4.4.2+0"
+version = "4.4.2+2"
 
 [[deps.FastBroadcast]]
 deps = ["ArrayInterface", "ArrayInterfaceCore", "LinearAlgebra", "Polyester", "Static", "StrideArraysCore"]
@@ -577,6 +640,9 @@ deps = ["LinearAlgebra"]
 git-tree-sha1 = "25ff6094a718c5dd0996c04d9e52eb2def86c4e3"
 uuid = "29a986be-02c6-4525-aec4-84b980013641"
 version = "1.2.5"
+
+[[deps.FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
@@ -886,10 +952,12 @@ version = "1.0.0"
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
+version = "0.6.3"
 
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
+version = "7.84.0+0"
 
 [[deps.LibGit2]]
 deps = ["Base64", "NetworkOptions", "Printf", "SHA"]
@@ -898,6 +966,7 @@ uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
 uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
+version = "1.10.2+0"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -1011,6 +1080,7 @@ version = "1.1.3"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+version = "2.28.0+0"
 
 [[deps.Measures]]
 git-tree-sha1 = "e498ddeee6f9fdb4551ce855a46f54dbd900245f"
@@ -1028,6 +1098,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+version = "2022.2.1"
 
 [[deps.MuladdMacro]]
 git-tree-sha1 = "c6190f9a7fc5d9d5915ab29f2134421b12d24a68"
@@ -1054,6 +1125,7 @@ version = "1.0.1"
 
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+version = "1.2.0"
 
 [[deps.NonlinearSolve]]
 deps = ["ArrayInterfaceCore", "FiniteDiff", "ForwardDiff", "IterativeSolvers", "LinearAlgebra", "RecursiveArrayTools", "RecursiveFactorization", "Reexport", "SciMLBase", "Setfield", "StaticArrays", "UnPack"]
@@ -1076,10 +1148,12 @@ version = "1.3.5+1"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
+version = "0.3.20+0"
 
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
+version = "0.8.1+0"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1116,6 +1190,11 @@ git-tree-sha1 = "61d8e295c33ed44dca9ca37fd7e825fd7a5a43cd"
 uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 version = "6.24.0"
 
+[[deps.PCRE2_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
+version = "10.40.0+0"
+
 [[deps.PCRE_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "b2a7af664e098055a7529ad1a900ded962bca488"
@@ -1149,6 +1228,7 @@ version = "0.40.1+0"
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+version = "1.8.0"
 
 [[deps.PlotThemes]]
 deps = ["PlotUtils", "Statistics"]
@@ -1312,6 +1392,7 @@ version = "0.3.0+0"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
 
 [[deps.SIMDDualNumbers]]
 deps = ["ForwardDiff", "IfElse", "SLEEFPirates", "VectorizationBase"]
@@ -1472,6 +1553,7 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "Pkg", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
+version = "5.10.1+0"
 
 [[deps.Sundials]]
 deps = ["CEnum", "DataStructures", "DiffEqBase", "Libdl", "LinearAlgebra", "Logging", "Reexport", "SnoopPrecompile", "SparseArrays", "Sundials_jll"]
@@ -1488,6 +1570,7 @@ version = "5.2.1+0"
 [[deps.TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+version = "1.0.0"
 
 [[deps.TableTraits]]
 deps = ["IteratorInterfaceExtensions"]
@@ -1504,6 +1587,7 @@ version = "1.7.0"
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
+version = "1.10.1"
 
 [[deps.TensorCore]]
 deps = ["LinearAlgebra"]
@@ -1737,6 +1821,7 @@ version = "1.4.0+3"
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+version = "1.2.12+3"
 
 [[deps.Zstd_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1765,6 +1850,7 @@ version = "0.15.1+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl", "OpenBLAS_jll"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
+version = "5.1.1+0"
 
 [[deps.libfdk_aac_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1787,10 +1873,12 @@ version = "1.3.7+1"
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
+version = "1.48.0+0"
 
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
+version = "17.4.0+0"
 
 [[deps.x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1812,38 +1900,48 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═3e86f585-17d4-487f-91e9-db9523f37e97
+# ╟─3e86f585-17d4-487f-91e9-db9523f37e97
 # ╠═5c140e46-2469-11ed-00f2-c1f22789cfe3
-# ╠═e3aaa1fd-a4f9-4569-9c43-fb867583e812
+# ╟─e3aaa1fd-a4f9-4569-9c43-fb867583e812
 # ╠═210e8f2c-997e-478e-9016-62f54ba654d5
-# ╠═2ed703d3-a82e-4ef1-9840-bbca72bab4b2
+# ╟─2ed703d3-a82e-4ef1-9840-bbca72bab4b2
 # ╠═ae7a72ea-8005-4707-b9df-0d58bf915a32
 # ╠═4d0fa338-632d-4a3c-9178-cc25ff775070
 # ╠═fed4b6b5-7bd2-4353-b77d-92e2f322bbc1
-# ╠═ac8fb9fc-dad9-41bd-b716-5217bae03a51
-# ╠═fd02957b-5fff-4566-bb0a-fee3f2945dba
+# ╟─ac8fb9fc-dad9-41bd-b716-5217bae03a51
+# ╟─fd02957b-5fff-4566-bb0a-fee3f2945dba
 # ╠═13e018b8-1921-46e8-8cdd-df976b963807
-# ╠═e22d00c8-0190-425d-bfb6-031e9813f67f
+# ╟─e22d00c8-0190-425d-bfb6-031e9813f67f
 # ╠═1750eaa6-c593-4b4b-9675-28929995380a
+# ╟─6ce9f134-0526-4552-ae56-10c02d2f1e50
 # ╠═75e911fa-7705-48c1-9a10-69f143c34626
+# ╟─d791e2d9-4aec-415e-b4f2-f0b0cc48a57e
 # ╠═6f8e2105-f549-4ea5-8869-3c33c799d86e
 # ╠═631e0d6b-4004-467c-99c2-59cf34bdc442
-# ╠═d28f1c8b-cf4a-4e4b-81ab-0d4a6276329e
+# ╟─58e66f06-08b0-4f55-9eec-a6b46fdd43ab
+# ╠═21759c5e-ef85-4928-ac2b-786619aaa89a
+# ╟─bce0d3ad-2ebf-43cd-bc5e-411ab829d48f
+# ╠═c17432c9-55de-47d3-8bd6-5ee04338eb0e
+# ╠═1c0a51a4-cb84-4e01-9440-22781858f3e8
+# ╠═258f3d1a-0d14-45bb-98be-0e3a8cced8c9
+# ╠═2dd2bde4-99d7-479d-a353-b1a55ea5e785
+# ╟─d28f1c8b-cf4a-4e4b-81ab-0d4a6276329e
 # ╠═10fc73d5-5af0-4232-8e6c-d681332d6ff9
-# ╠═ee30e0c2-9749-40db-9ac0-7ef9393163b4
+# ╟─ee30e0c2-9749-40db-9ac0-7ef9393163b4
 # ╠═e191d93e-54bd-4c78-8292-bfce18fb0f68
 # ╠═4f8e1ca6-02b5-4b96-889c-25583260ddd0
-# ╠═055a2a09-31b0-4e1b-a5c4-2f1cc71671ba
+# ╟─055a2a09-31b0-4e1b-a5c4-2f1cc71671ba
 # ╠═bda3fba1-aacd-471d-9057-3454646944b5
 # ╠═2c7a6019-28e8-4561-b250-87f76291cea6
-# ╠═1ad2281d-6143-4586-95ca-cb9df28f0b46
+# ╟─1ad2281d-6143-4586-95ca-cb9df28f0b46
 # ╠═f705da23-2b0e-4b1c-9035-885243025f4f
-# ╠═eea1f369-f5d8-472c-a434-8e49910a68e6
+# ╟─eea1f369-f5d8-472c-a434-8e49910a68e6
 # ╠═902828f2-b8a9-4b2d-b7a0-9dc7caefb5a4
 # ╠═e703a309-cb10-48ef-984a-bd6926f40531
 # ╠═2f5bdbaf-41fe-401c-a7d6-ae345f4fd10a
 # ╟─aed49ea7-85bf-4201-8ebc-50e3e2e3ac2b
-# ╠═4169aa3a-fa87-418d-84b8-f9050f10574b
+# ╟─4169aa3a-fa87-418d-84b8-f9050f10574b
+# ╟─cd7a1801-d97b-4fa3-850d-04dafd83b19f
 # ╠═65221a3d-9a7a-4469-8b4b-68ad59321d94
 # ╠═2620688b-7862-4057-a23c-a369d45a04d3
 # ╠═16be68c9-03ac-45cc-86dc-3c09e7a983dd
@@ -1853,7 +1951,7 @@ version = "1.4.1+0"
 # ╠═b9b87dce-f8a7-4248-ac9c-42bdd235b5cf
 # ╠═60116697-b961-4590-992a-ae03e1449c26
 # ╠═41e211c5-b224-49dd-91c7-57870c807464
-# ╠═1349b830-1627-47bf-b6db-cdcd987de3a5
+# ╟─1349b830-1627-47bf-b6db-cdcd987de3a5
 # ╠═1f7e97f2-2cdb-4cd8-9aca-e50de742e18f
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
