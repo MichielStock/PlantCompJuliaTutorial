@@ -86,6 +86,10 @@ In C3 plants, the first stable product of photosynthesis is a compound with thre
 
 """
 
+
+# ╔═╡ d0b85269-7ee0-49be-ab70-ba14ad3af158
+PlutoUI.LocalResource("images/photosynthesis.png")
+
 # ╔═╡ d60e8c57-eb14-4245-8d2a-f7b84cc67acb
 md"""
 
@@ -113,6 +117,11 @@ end k1 k2 k3 k4 kpr
 md"""
 Two reaction networks can be combined using the *extend* function. This is done below for the light and dark reactions of photosynthesis.
 """
+
+
+
+# ╔═╡ cfee3d35-a01e-4bd2-a99c-40b056ce2ea4
+PlutoUI.LocalResource("images/photorespiration.png")
 
 # ╔═╡ 3367c17f-9722-4cfd-8cd7-a1e3a04b4a30
 @named photosynthesis = extend(light_reactions, dark_reactions)
@@ -142,6 +151,10 @@ In C4 plants, the first stable product of photosynthesis is a compound with four
 They minimize photorespiration by compartmentalizing carbon dioxide fixation and the Calvin cycle in separate cells. 
 
 """
+
+
+# ╔═╡ 0aa49094-5f3f-4d98-9dba-ff0b1e36a08e
+PlutoUI.LocalResource("images/c3_and_c4_models.png")
 
 # ╔═╡ dafb574a-b542-4951-882c-47eb31bdc6ef
 C4assimilation = @reaction_network begin
@@ -235,9 +248,8 @@ PlutoUI = "~0.7.43"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.2"
+julia_version = "1.7.3"
 manifest_format = "2.0"
-project_hash = "147deee7d1dcd6310a5859c6e27aed645fbb073c"
 
 [[deps.AbstractAlgebra]]
 deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Markdown", "Random", "RandomExtensions", "SparseArrays", "Test"]
@@ -269,7 +281,6 @@ version = "2.3.0"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
-version = "1.1.1"
 
 [[deps.ArnoldiMethod]]
 deps = ["LinearAlgebra", "Random", "StaticArrays"]
@@ -489,7 +500,6 @@ version = "4.2.0"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "0.5.2+0"
 
 [[deps.CompositeTypes]]
 git-tree-sha1 = "d5b014b216dc891e81fea299638e4c10c657b582"
@@ -631,7 +641,6 @@ version = "0.5.13"
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
-version = "1.6.0"
 
 [[deps.DualNumbers]]
 deps = ["Calculus", "NaNMath", "SpecialFunctions"]
@@ -1031,12 +1040,10 @@ version = "1.0.0"
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
-version = "0.6.3"
 
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "7.84.0+0"
 
 [[deps.LibGit2]]
 deps = ["Base64", "NetworkOptions", "Printf", "SHA"]
@@ -1045,7 +1052,6 @@ uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
 uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
-version = "1.10.2+0"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -1159,7 +1165,6 @@ version = "1.1.6"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
-version = "2.28.0+0"
 
 [[deps.Measures]]
 git-tree-sha1 = "e498ddeee6f9fdb4551ce855a46f54dbd900245f"
@@ -1195,7 +1200,6 @@ version = "8.26.0"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2022.2.1"
 
 [[deps.MuladdMacro]]
 git-tree-sha1 = "c6190f9a7fc5d9d5915ab29f2134421b12d24a68"
@@ -1234,7 +1238,6 @@ version = "1.0.1"
 
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
-version = "1.2.0"
 
 [[deps.NonlinearSolve]]
 deps = ["ArrayInterfaceCore", "FiniteDiff", "ForwardDiff", "IterativeSolvers", "LinearAlgebra", "RecursiveArrayTools", "RecursiveFactorization", "Reexport", "SciMLBase", "Setfield", "StaticArrays", "UnPack"]
@@ -1257,12 +1260,10 @@ version = "1.3.5+1"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-version = "0.3.20+0"
 
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.1+0"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
@@ -1308,7 +1309,6 @@ version = "6.28.0"
 [[deps.PCRE2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
-version = "10.40.0+0"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
@@ -1342,7 +1342,6 @@ version = "0.40.1+0"
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.8.0"
 
 [[deps.PlotThemes]]
 deps = ["PlotUtils", "Statistics"]
@@ -1525,7 +1524,6 @@ version = "0.5.3"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
-version = "0.7.0"
 
 [[deps.SIMDDualNumbers]]
 deps = ["ForwardDiff", "IfElse", "SLEEFPirates", "VectorizationBase"]
@@ -1692,7 +1690,6 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "Pkg", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
-version = "5.10.1+0"
 
 [[deps.Sundials]]
 deps = ["CEnum", "DataStructures", "DiffEqBase", "Libdl", "LinearAlgebra", "Logging", "Reexport", "SnoopPrecompile", "SparseArrays", "Sundials_jll"]
@@ -1721,7 +1718,6 @@ version = "4.10.4"
 [[deps.TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
-version = "1.0.0"
 
 [[deps.TableTraits]]
 deps = ["IteratorInterfaceExtensions"]
@@ -1738,7 +1734,6 @@ version = "1.9.0"
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
-version = "1.10.1"
 
 [[deps.TensorCore]]
 deps = ["LinearAlgebra"]
@@ -2006,7 +2001,6 @@ version = "1.4.0+3"
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
-version = "1.2.12+3"
 
 [[deps.Zstd_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2041,7 +2035,6 @@ version = "0.15.1+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl", "OpenBLAS_jll"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.1.1+0"
 
 [[deps.libfdk_aac_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2064,12 +2057,10 @@ version = "1.3.7+1"
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
-version = "1.48.0+0"
 
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
-version = "17.4.0+0"
 
 [[deps.x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2104,17 +2095,20 @@ version = "1.4.1+0"
 # ╠═9b97a96d-17c6-455f-aedb-2ac4c558398d
 # ╠═5ee45a9e-bf0e-4283-b359-1d0ab55141cd
 # ╠═cc3b6646-44c8-435e-8170-c3b1c4bd5098
-# ╟─46029492-f2fe-43f4-b23e-5f8b83e73475
+# ╠═46029492-f2fe-43f4-b23e-5f8b83e73475
+# ╠═d0b85269-7ee0-49be-ab70-ba14ad3af158
 # ╟─d60e8c57-eb14-4245-8d2a-f7b84cc67acb
 # ╠═34516474-248c-4ca4-aa01-70b0cb350258
 # ╠═8f7cb1e6-b6e5-446f-a403-d32b760f79df
-# ╟─fc2389d6-7958-4b5e-99e2-9459b1a6125b
+# ╠═fc2389d6-7958-4b5e-99e2-9459b1a6125b
+# ╠═cfee3d35-a01e-4bd2-a99c-40b056ce2ea4
 # ╠═3367c17f-9722-4cfd-8cd7-a1e3a04b4a30
 # ╠═ea3d6f00-fd40-495b-bdf8-f59e2bfd702d
 # ╟─8412837f-a624-4f48-aa60-24b19fb66c3b
 # ╠═d2bf1bc0-fa06-4531-a943-18cde170e401
 # ╠═cf52dc3e-91d1-4420-b660-4e4e04f3186f
-# ╟─2fe7ba4a-7d4d-4c54-96bd-1e56ef2cde80
+# ╠═2fe7ba4a-7d4d-4c54-96bd-1e56ef2cde80
+# ╠═0aa49094-5f3f-4d98-9dba-ff0b1e36a08e
 # ╠═dafb574a-b542-4951-882c-47eb31bdc6ef
 # ╠═957c8973-4c24-45e5-9747-63ea1d451dfb
 # ╠═8948836d-7c61-4db7-8103-619b4e980298
