@@ -1,14 +1,14 @@
 # Modelling Plants Using the Julia Language
 
-This page contains the Pluto notebooks accompanying the PlantComp 2022 workshop on the use of the Julia language to develop and excecute plant models.
+This page contains the Pluto notebooks accompanying the PlantComp 2022 workshop on the use of the Julia language to develop and excecute plant models. You can access the slides [here](https://docs.google.com/presentation/d/1wZVotb_fyD5ymwLG6ZSjglV9_EspEBGPREP8ri7K9Zo/edit?usp=sharing).
 
 ## Contents
 
 After a brief introduction to Julia and mathematics in Julia, we will dive in 
 
-1. The first notebook 1_ODEs.jl introduces a highly efficient software package in Julia to solve differential equations.
-2. Next the notebook 2_Catalyst.jl provides a demonstration of how to simulate biochemical reaction systems in Julia.
-3. An optional third notebook 3_Turing.jl contains a general guide to probabilistic programming in Julia for plant applications.
+1. The first notebook [1_ODEs.jl](https://michielstock.github.io/PlantCompJuliaTutorial/1_ODEs.jl.html) introduces a highly efficient software package in Julia to solve differential equations.
+2. Next the notebook [2_Catalyst.jl](https://michielstock.github.io/PlantCompJuliaTutorial/2_catalyst.jl.html) provides a demonstration of how to simulate biochemical reaction systems in Julia.
+3. An optional third notebook [3_Turing.jl](https://michielstock.github.io/PlantCompJuliaTutorial/3_turing.jl.html) contains a general guide to probabilistic programming in Julia for plant applications.
 
 ## Running the Pluto notebooks
 
