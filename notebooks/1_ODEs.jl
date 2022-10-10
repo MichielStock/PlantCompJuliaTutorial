@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.11
+# v0.19.13
 
 using Markdown
 using InteractiveUtils
@@ -105,7 +105,7 @@ Fill in the function below (we use $g$ instead of $f$). There is a slider where 
 """ 
 
 # ╔═╡ 21759c5e-ef85-4928-ac2b-786619aaa89a
-g(x, (μ, K, w), t) = μ * (0.5sin(w * t) + 0.5) * x * (1-x/K)
+g(x, (μ, K, w), t) = missing
 
 # ╔═╡ bce0d3ad-2ebf-43cd-bc5e-411ab829d48f
 md" w: $(@bind w Slider(0.1:0.1:2, show_value=true))"
@@ -161,6 +161,9 @@ function sse(μ, K)
 	return sum(abs2, xsim .- xs)
 end
 
+# ╔═╡ 4c7d34c0-d6fe-4666-b3ab-5cae9f0b3dd3
+sse(θ) = sse(θ...)
+
 # ╔═╡ 2c7a6019-28e8-4561-b250-87f76291cea6
 sse(μ, K)
 
@@ -203,7 +206,7 @@ To this end, consider the R* rule:
 $${\frac {dN_{j}}{dt}}=N_{j}(a_{j}R-d)$$
 $$\frac{dR}{dt}=r-R\sum _{j}a_{j}N_{j}$$
 
-Here, there is a shared resource $N$ that is consumed by several competing species $N_j$. For example, this might be nitrogen that is used by both the crop and the weeds.
+Here, a shared resource $R$ is consumed by several competing species $N_j$. For example, this might be nitrogen that is used by both the crop and the weeds.
 
 """
 
@@ -1932,6 +1935,7 @@ version = "1.4.1+0"
 # ╠═4f8e1ca6-02b5-4b96-889c-25583260ddd0
 # ╟─055a2a09-31b0-4e1b-a5c4-2f1cc71671ba
 # ╠═bda3fba1-aacd-471d-9057-3454646944b5
+# ╠═4c7d34c0-d6fe-4666-b3ab-5cae9f0b3dd3
 # ╠═2c7a6019-28e8-4561-b250-87f76291cea6
 # ╟─1ad2281d-6143-4586-95ca-cb9df28f0b46
 # ╠═f705da23-2b0e-4b1c-9035-885243025f4f
